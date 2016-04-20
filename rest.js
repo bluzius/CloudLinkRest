@@ -7,10 +7,17 @@ var _ = require('underscore');
 var logger = require('./logger');
 logger.level = 'error';
 
+/**
+ * Module containing function to connect to the Mi5 REST interface
+ * @param host {string} Host address of the CloudLink Server (http(s)://x.y.com/)
+ * @param user {string} User name for basic authentication
+ * @param password {string} Password for basic authentication
+ * @constructor
+ */
 function MI5REST(host, user, password){
-  this.host = host; // http(s)://x.y.com/
-  this.user = user; // basic auth
-  this.password = password; // basic auth
+  this.host = host;
+  this.user = user;
+  this.password = password;
 
   this.rejectUnauthorized = false; // Default param
   this.verbose = true; // log or not
@@ -19,7 +26,10 @@ module.exports = MI5REST;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Connection
-
+/**
+ * Test whether the CloudLink server is online
+ * @returns {Boolean} Is the server online?
+ */
 MI5REST.prototype.isOnline = function(){
   var options = this._options({
     target: 'helloWorld'
@@ -150,6 +160,11 @@ MI5REST.prototype.setBarcode = function(orderId, barcode){
     .then(this._safeJsonParse);
 };
 
+/**
+ * A trustworthy function, reloading the JobBoard for whatever reasons
+ * 
+ * TODO: Figure out what the function does and provide a reasonable description.
+ */
 MI5REST.prototype.reloadJobboardHack = function(){
   var self = this;
 
@@ -174,19 +189,26 @@ MI5REST.prototype.reloadJobboardHack = function(){
   return Promise.all(ordersPromise);
 };
 
+/**
+ * Some function
+ * @todo Another function to be documented
+ * @param orderId {someType} Blabla
+ */
 MI5REST.prototype.reloadOrderInJobboard = function(orderId){
   return this.updateOrder({orderId: orderId, date: moment().utc().format()});
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Orders / Jobboard
-
+/**
+ * Returns all orders since the given time
+ * @param timestamp
+ */
 MI5REST.prototype.getOrdersSince = function(timestamp){
   if(typeof timestamp == 'undefined') {
     timestamp = moment().subtract(1,'m').utc().format(); // 1 min ago in UTC
   }
-
-
+  
   var options = this._options({
     target: 'getOrdersSince',
     form: {
