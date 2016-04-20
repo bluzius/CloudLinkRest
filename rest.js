@@ -48,10 +48,14 @@ MI5REST.prototype.isOnline = function(){
     });
 };
 
+/**
+ * Update machine status
+ * @param status {string} Machine status ['out of order','working']
+ */
 MI5REST.prototype.reportMachineStatus = function(status){
   var options = this._options({
     target: 'reportMachineStatus',
-    form: {status: status} // 'out of order','working'
+    form: {status: status}
   });
 
   logger.info('/reportMachineStatus', status);
@@ -63,7 +67,11 @@ MI5REST.prototype.reportMachineStatus = function(status){
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Orders
-
+/**
+ * Returns the orders with the given status
+ * @param status {string} pending / in progress / done / delivered / rejected / failure / aborted
+ * @return {JSON} Orders
+ */
 MI5REST.prototype.getOrdersByStatus = function(status){
   var options = this._options({
     target: 'getOrdersByStatus',
@@ -77,7 +85,11 @@ MI5REST.prototype.getOrdersByStatus = function(status){
     .then(this._safeJsonParse);
 };
 
-// not correctly implemented
+/**
+ * Return all orders filter by??
+ * @todo not correctly implemented
+ * @param status
+ */
 MI5REST.prototype.getOrdersFiltered = function(status){
   var filter = {
     status: status
@@ -94,6 +106,11 @@ MI5REST.prototype.getOrdersFiltered = function(status){
     .then(this._safeJsonParse);
 };
 
+/**
+ * Place an order online
+ * @param order {JSON} Order details
+ * @return {JSON} status
+ */
 MI5REST.prototype.placeOrder = function(order){
   var options = this._options({
     target: 'placeOrder',
@@ -107,9 +124,13 @@ MI5REST.prototype.placeOrder = function(order){
     .then(this._safeJsonParse);
 };
 
+/**
+ * @todo fix. currently fails in test
+ * @param order
+ */
 MI5REST.prototype.placeOrderGet = function(order){
   var options = this._options({
-    target: 'placeOrder/'+order.recipeId+'/'+JSON.stringify(order.parameters)+'/'+order.marketPlaceId,
+    target: 'placeOrder/'+order.recipeId+'/'+JSON.stringify(order.parameters)+'/'+order.marketPlaceId
   });
 
   logger.info('/placeOrderGet', order);
@@ -223,6 +244,11 @@ MI5REST.prototype.getOrdersSince = function(timestamp){
     .then(this._safeJsonParse);
 };
 
+/**
+ * Return all orders updated recently
+ * @param {float} [seconds=60] Time window
+ * @return {JSON} Orders
+ */
 MI5REST.prototype.getOrdersUpdatedSince = function(seconds){
   if(typeof seconds == 'undefined') {
     seconds = 60;
@@ -245,7 +271,10 @@ MI5REST.prototype.getOrdersUpdatedSince = function(seconds){
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Recipes
-
+/**
+ * Get a list of recipes
+ *  @return {JSON} Recipes
+ */
 MI5REST.prototype.getRecipes = function(){
   var options = this._options({
     target: 'getRecipes'
@@ -258,6 +287,10 @@ MI5REST.prototype.getRecipes = function(){
     .then(this._safeJsonParse);
 };
 
+/**
+ * Loads the default recipes on the CloudLink server
+ * @return {JSON} Status information and recipes
+ */
 MI5REST.prototype.loadDefaultRecipes = function(){
   var options = this._options({
     target: 'loadDefaultRecipes'
@@ -273,6 +306,13 @@ MI5REST.prototype.loadDefaultRecipes = function(){
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Feedback
 
+/**
+ * Give customer feedback on an order. Negative feedback will trigger an operator push notification.
+ * @param {Int} orderId ID of the order to be reviewed
+ * @param {Boolean} like Positive or negative feedback
+ * @param {String} feedbackText Feedback text
+ * @return {JSON} status
+ */
 MI5REST.prototype.giveFeedback = function(orderId, like, feedbackText){
   var feedback = {
     productId:  orderId,
@@ -293,7 +333,10 @@ MI5REST.prototype.giveFeedback = function(orderId, like, feedbackText){
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Devices GCM
-
+/**
+ * Get a list of devices for the GCM push service
+ * @return {JSON} IDs of registered devices
+ */
 MI5REST.prototype.getRegisteredDevices = function(){
   var options = this._options({
     target: 'getRegIds'
@@ -307,6 +350,11 @@ MI5REST.prototype.getRegisteredDevices = function(){
     .then(this._safeJsonParse); // do it twice, because it returns a string of regids '["regid1", "regId2", ....]'
 };
 
+/**
+ * Register a GCM device online
+ * @param {String} regId ID of the device
+ * @return {JSON} Status
+ */
 MI5REST.prototype.registerDevice = function(regId){
   var options = this._options({
     target: 'register',
