@@ -86,9 +86,9 @@ MI5REST.prototype.getOrdersByStatus = function(status){
 };
 
 /**
- * Return all orders filter by??
+ * Return all orders filtered by??
  * @todo not correctly implemented
- * @param status
+ * @param status {string} Order status [pending / in progress / done / delivered / rejected / failure / aborted]
  */
 MI5REST.prototype.getOrdersFiltered = function(status){
   var filter = {
@@ -109,7 +109,7 @@ MI5REST.prototype.getOrdersFiltered = function(status){
 /**
  * Place an order online
  * @param order {JSON} Order details
- * @return {JSON} status
+ * @return status {JSON} Order status [pending / in progress / done / delivered / rejected / failure / aborted]
  */
 MI5REST.prototype.placeOrder = function(order){
   var options = this._options({
@@ -139,6 +139,12 @@ MI5REST.prototype.placeOrderGet = function(order){
   return this._GetRequest(options);
 };
 
+/**
+ * Update the status of an order
+ * @param orderid {Int}  ID of the order
+ * @param status {String} Order status [pending / in progress / done / delivered / rejected / failure / aborted]
+ * @return {JSON} Update status
+ */
 MI5REST.prototype.updateOrderStatus = function(orderid, status){
   var options = this._options({
     target: 'updateOrderStatus',
@@ -152,6 +158,11 @@ MI5REST.prototype.updateOrderStatus = function(orderid, status){
     .then(this._safeJsonParse);
 };
 
+/**
+ * Update an order
+ * @param order {JSON} Order details
+ * @return {JSON} Update status
+ */
 MI5REST.prototype.updateOrder = function(order){
   var options = this._options({
     target: 'updateOrder',
@@ -165,6 +176,12 @@ MI5REST.prototype.updateOrder = function(order){
     .then(this._safeJsonParse);
 };
 
+/**
+ * Set the barcode for an order
+ * @param orderId {Int} Order ID
+ * @param barcode {Int} Barcode number
+ * @return {JSON} Update status
+ */
 MI5REST.prototype.setBarcode = function(orderId, barcode){
   var options = this._options({
     target: 'setBarcode',
@@ -182,9 +199,7 @@ MI5REST.prototype.setBarcode = function(orderId, barcode){
 };
 
 /**
- * A trustworthy function, reloading the JobBoard for whatever reasons
- * 
- * TODO: Figure out what the function does and provide a reasonable description.
+ * Experimental - makes orders appear multiple times
  */
 MI5REST.prototype.reloadJobboardHack = function(){
   var self = this;
@@ -211,9 +226,8 @@ MI5REST.prototype.reloadJobboardHack = function(){
 };
 
 /**
- * Some function
- * @todo Another function to be documented
- * @param orderId {someType} Blabla
+ * Reload the order on the JobBoard
+ * @param orderId {Int} Order ID
  */
 MI5REST.prototype.reloadOrderInJobboard = function(orderId){
   return this.updateOrder({orderId: orderId, date: moment().utc().format()});
@@ -273,7 +287,7 @@ MI5REST.prototype.getOrdersUpdatedSince = function(seconds){
 // Recipes
 /**
  * Get a list of recipes
- *  @return {JSON} Recipes
+ * @return {JSON} Recipes
  */
 MI5REST.prototype.getRecipes = function(){
   var options = this._options({
